@@ -1,0 +1,130 @@
+#!/usr/local/bin/node
+
+var fs = require('fs');
+var Promise = require('bluebird');
+var exec = Promise.promisify(require('child_process').exec);
+var colors = require('colors');
+
+// add methods to the console for each of the styles in the colors library
+// e.g. console.green('hello', 'world')
+for (var style in colors.styles) {
+  console[style] = function(color) {
+    var args = [].slice.call(arguments, 1);
+    var styledStrings = args.map(str => str[color] || JSON.stringify(str)[color]);
+    console.log.apply(this, styledStrings);
+  }.bind(console, style);
+}
+
+/* all color options:
+ * black, red, green, yellow, blue, magenta, cyan, white, gray, grey
+ * bgBlack, bgRed, bgGreen, bgYellow, bgBlue, bgMagenta, bgCyan, bgWhite
+ * reset, bold, dim, italic, underline, inverse, hidden, strikethrough
+ */
+
+
+// method to convert to pascal-case
+String.prototype.pascal = function() {
+  return this.replace(/^([a-z])/, let => let.toUpperCase())
+             .replace(/[\-\_]([a-zA-Z])/,  let => let[1].toUpperCase());
+}
+
+
+var commands = {
+  help: () => {
+    console.yellow('Welcome to mongoose-model-cli!');
+  },
+
+  init: () => {
+    var dir = fs.readdirSync('./');
+    var modelDir = dir.indexOf('models');
+    if (modelDir === -1) fs.mkdirSync('./models');
+  },
+
+  seed: () => {
+    exec('node ./seedfile.js')
+    .then(console.log)
+    .catch(console.error);
+  },
+
+};
+
+commands.create = commands.generate = commands.g = {
+
+  model: () => {
+    var name = process.argv[4];
+    if (!name) return console.bgRed('Must supply a name for the model.');
+    name = name.pascal();
+    var attrs = process.argv.slice(5);
+    attrs = attrs.reduce((obj, pair) => {
+      pair = pair.split(':');
+      obj[pair[0]] = pair[1].pascal();
+      return obj;
+    }, {});
+
+    commands.init();
+    console.cyan(`Creating new model: ${name}`);
+
+    var file = `\
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
+var newSchema = new Schema({
+`;
+
+    for (var attr in attrs) {
+      var dataType = attrs[attr];
+      if (dataType.slice(0, 2) === 'Id') {
+        dataType = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
+      } 
+      else if (dataType === 'Mixed') {
+        dataType = `Schema.Types.Mixed`;
+      }
+      else if (!global[dataType]) {
+        return console.bgRed('Invalid data type ' + dataType);
+      }
+      file += `  '${attr}': { type: ${dataType} },\n`;
+    }
+
+    file += `\
+  'createdAt': { type: Date, default: Date.now },
+  'updatedAt': { type: Date, default: Date.now }
+});
+
+newSchema.pre('save', function(next){
+  this.updatedAt = Date.now();
+  next();
+});
+
+
+newSchema.pre('update', function() {
+  this.update({}, { $set: { updatedAt: new Date() } });
+});
+
+module.exports = mongoose.model('${name}', newSchema);
+`;
+
+    fs.writeFile(`models/${name}.js`, file, err => {
+      if (err) console.red(err);
+      else console.green(name + ' was successfully created!');
+    });
+  },
+
+  migration: () => {
+    var name = process.argv[4];
+
+  }
+}
+
+
+var command = process.argv[2];
+var type = process.argv[3];
+
+try {
+  if (type)
+    commands[command][type]();
+  else
+    commands[command]();
+} catch(err) {
+  console.bgRed(err);
+  commands.help();
+}

@@ -1,0 +1,27 @@
+{
+  "name": "mongoose-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "dependencies": {
+    "bluebird": "^3.0.5",
+    "colors": "^1.1.2",
+    "faker": "^3.0.1",
+    "mongoose": "^4.2.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acarl005/mongoose-cli.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/acarl005/mongoose-cli/issues"
+  },
+  "homepage": "https://github.com/acarl005/mongoose-cli#readme"
+}
