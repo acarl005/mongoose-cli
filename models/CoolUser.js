@@ -5,6 +5,7 @@ if (mongoose.connection.readyState === 0) {
 }
 
 var newSchema = new Schema({
+  
   'name': { type: String },
   'age': { type: Number },
   'houseId': { type: Schema.Types.ObjectId, ref: 'House' },

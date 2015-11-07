@@ -3,6 +3,7 @@
 var fs = require('fs');
 var exec = require('child_process').exec;
 var colors = require('colors');
+var ejs = require('ejs');
 
 // add methods to the console for each of the styles in the colors library
 // e.g. console.green('hello', 'world')
@@ -66,50 +67,65 @@ commands.create = commands.generate = commands.g = {
       return obj;
     }, {});
 
-    commands.init();
-    console.cyan(`Creating new model: ${name}`);
-
-    var file = `\
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-if (mongoose.connection.readyState === 0) {
-  mongoose.connect(require('./.connection-string'));
-}
-
-var newSchema = new Schema({
-`;
-
     for (var attr in attrs) {
       var dataType = attrs[attr];
       if (dataType.slice(0, 2) === 'Id') {
-        dataType = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
+        attrs[attr] = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
       } 
       else if (dataType === 'Mixed') {
-        dataType = `Schema.Types.Mixed`;
+        attrs[attr] = `Schema.Types.Mixed`;
       }
       else if (!global[dataType]) {
         return console.bgRed('Invalid data type ' + dataType);
       }
-      file += `  '${attr}': { type: ${dataType} },\n`;
     }
 
-    file += `\
-  'createdAt': { type: Date, default: Date.now },
-  'updatedAt': { type: Date, default: Date.now }
-});
+    commands.init();
+    console.cyan(`Creating new model: ${name}`);
 
-newSchema.pre('save', function(next){
-  this.updatedAt = Date.now();
-  next();
-});
+    var file = ejs.render(fs.readFileSync('./templates/model.ejs').toString(), { name, attrs });
+    console.log(file);
+//     var file = `\
+// var mongoose = require('mongoose');
+// var Schema = mongoose.Schema;
+// if (mongoose.connection.readyState === 0) {
+//   mongoose.connect(require('./.connection-string'));
+// }
+
+// var newSchema = new Schema({
+// `;
+
+//     for (var attr in attrs) {
+//       var dataType = attrs[attr];
+//       if (dataType.slice(0, 2) === 'Id') {
+//         dataType = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
+//       } 
+//       else if (dataType === 'Mixed') {
+//         dataType = `Schema.Types.Mixed`;
+//       }
+//       else if (!global[dataType]) {
+//         return console.bgRed('Invalid data type ' + dataType);
+//       }
+//       file += `  '${attr}': { type: ${dataType} },\n`;
+//     }
+
+//     file += `\
+//   'createdAt': { type: Date, default: Date.now },
+//   'updatedAt': { type: Date, default: Date.now }
+// });
+
+// newSchema.pre('save', function(next){
+//   this.updatedAt = Date.now();
+//   next();
+// });
 
 
-newSchema.pre('update', function() {
-  this.update({}, { $set: { updatedAt: new Date() } });
-});
+// newSchema.pre('update', function() {
+//   this.update({}, { $set: { updatedAt: new Date() } });
+// });
 
-module.exports = mongoose.model('${name}', newSchema);
-`;
+// module.exports = mongoose.model('${name}', newSchema);
+// `;
 
     fs.writeFile(`models/${name}.js`, file, err => {
       if (err) console.red(err);
