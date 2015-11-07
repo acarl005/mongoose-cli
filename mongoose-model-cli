@@ -1,7 +1,7 @@
 #!/usr/local/bin/node
 
-var fs = require('fs');
 var Promise = require('bluebird');
+var fs = require('fs');
 var exec = Promise.promisify(require('child_process').exec);
 var colors = require('colors');
 
@@ -10,7 +10,7 @@ var colors = require('colors');
 for (var style in colors.styles) {
   console[style] = function(color) {
     var args = [].slice.call(arguments, 1);
-    var styledStrings = args.map(str => str[color] || JSON.stringify(str)[color]);
+    var styledStrings = args.map(str => JSON.stringify(str)[color]);
     console.log.apply(this, styledStrings);
   }.bind(console, style);
 }
@@ -37,7 +37,19 @@ var commands = {
   init: () => {
     var dir = fs.readdirSync('./');
     var modelDir = dir.indexOf('models');
-    if (modelDir === -1) fs.mkdirSync('./models');
+    if (modelDir !== -1) return;
+    fs.mkdirSync('./models');
+    fs.mkdirSync('./models/seed');
+    fs.mkdirSync('./models/migrations');
+    var file = `\
+// place connection string here
+// e.g. var uri = 'mongodb://andy:corn@ds051334.mongolab.com:51334/cli';
+// or   var uri = config.get('mongo');
+var uri = '';
+if (!uri) throw new Error('You need to provide the connection string. Open "models/.connection-string.js" and export it.');
+module.exports = uri;
+`;
+    fs.writeFile('./models/.connection-string.js', file);
   },
 
   seed: () => {
@@ -67,6 +79,9 @@ commands.create = commands.generate = commands.g = {
     var file = `\
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+if (mongoose.connection.readyState === 0) {
+  mongoose.connect(require('./.connection-string'));
+}
 
 var newSchema = new Schema({
 `;
@@ -109,10 +124,32 @@ module.exports = mongoose.model('${name}', newSchema);
     });
   },
 
+
   migration: () => {
     var name = process.argv[4];
+    if (!name) return console.red('You must specify the model for this migration');
+    name = name.pascal();
+    var models = fs.readdirSync('./models');
+    var modelInd = models.indexOf(name + '.js');
+    if (modelInd === -1) return console.red('You have yet to create a model: ' + name);
+    console.cyan('Creating a migration file for: ' + name);
+    var file = `\
+var mongoose = require('mongoose');
+var ${name} = require('../${name}.js');
 
+${name}.find().exec()
+.then(results => {
+  console.log(results);
+  mongoose.connection.close();
+});
+`;
+    fs.writeFile(`models/migrations/${name}-${Date.now()}.js`, file, err => {
+      if (err) console.red(err);
+      else console.green(`Migration for ${name} was successfully created!`);
+    });
   }
+
+
 }
 
 

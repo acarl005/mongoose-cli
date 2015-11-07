@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+if (mongoose.connection.readyState === 0) {
+  mongoose.connect(require('./.connection-string'));
+}
 
 var newSchema = new Schema({
   'name': { type: String },
@@ -20,4 +23,4 @@ newSchema.pre('update', function() {
   this.update({}, { $set: { updatedAt: new Date() } });
 });
 
-module.exports = mongoose.model('User', newSchema);
+module.exports = mongoose.model('CoolUser', newSchema);
