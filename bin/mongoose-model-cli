@@ -5,6 +5,8 @@ var exec = require('child_process').exec;
 var colors = require('colors');
 var ejs = require('ejs');
 
+var root = __dirname + '/../';
+
 // add methods to the console for each of the styles in the colors library
 // e.g. console.green('hello', 'world')
 for (var style in colors.styles) {
@@ -42,8 +44,8 @@ function init() {
   fs.mkdirSync('./models');
   fs.mkdirSync('./models/seed');
   fs.mkdirSync('./models/migrations');
-  fs.createReadStream('templates/.connection-string.js').pipe(fs.createWriteStream('models/.connection-string.js'));
-  fs.createReadStream('templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
+  fs.createReadStream(root + 'templates/connection-string.js').pipe(fs.createWriteStream('models/connection-string.js'));
+  fs.createReadStream(root + 'templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
 }
 
 function seed() {
@@ -67,7 +69,7 @@ function model() {
   commands.init();
   console.cyan(`Creating new model: ${name}`);
 
-  var file = ejs.render(fs.readFileSync('./templates/model.ejs').toString(), { name, attrs });
+  var file = ejs.render(fs.readFileSync(root + 'templates/model.ejs').toString(), { name, attrs });
 
   fs.writeFile(`models/${name}.js`, file, err => {
     if (err) console.red(err);
@@ -86,7 +88,7 @@ function migration() {
     return console.red('You have yet to create a model: ' + name);
 
   console.cyan('Creating a migration file for: ' + name);
-  var file = ejs.render(fs.readFileSync('./templates/migration.ejs').toString(), { name });
+  var file = ejs.render(fs.readFileSync(root + 'templates/migration.ejs').toString(), { name });
 
   fs.writeFile(`models/migrations/${name}-${Date.now()}.js`, file, err => {
     if (err) console.red(err);
