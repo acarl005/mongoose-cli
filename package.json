@@ -1,8 +1,10 @@
 {
-  "name": "mongoose-cli",
+  "name": "mongoose-model-cli",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "Generator for creating models, seeds, and migrations using mongoose.",
+  "bin": {
+    "mongoose": "./bin/mongoose-model-cli"
+  },
   "dependencies": {
     "colors": "^1.1.2",
     "ejs": "^2.3.4"
@@ -19,10 +21,17 @@
     "type": "git",
     "url": "git+https://github.com/acarl005/mongoose-cli.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Andrew Carlson <acarl005@g.ucla.edu> (https://github.com/acarl005)",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/acarl005/mongoose-cli/issues"
   },
-  "homepage": "https://github.com/acarl005/mongoose-cli#readme"
+  "homepage": "https://github.com/acarl005/mongoose-cli#readme",
+  "keywords": [
+    "mongoose",
+    "cli",
+    "orm",
+    "mongo",
+    "generator"
+  ]
 }
