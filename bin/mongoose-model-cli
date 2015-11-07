@@ -1,4 +1,4 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 
 var fs = require('fs');
 var exec = require('child_process').exec;
@@ -33,7 +33,7 @@ var commands = { help, init, seed };
 
 function help() {
   console.yellow('Welcome to mongoose-model-cli!');
-},
+}
 
 function init() {
   var dir = fs.readdirSync('./');
@@ -44,14 +44,14 @@ function init() {
   fs.mkdirSync('./models/migrations');
   fs.createReadStream('templates/.connection-string.js').pipe(fs.createWriteStream('models/.connection-string.js'));
   fs.createReadStream('templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
-},
+}
 
 function seed() {
   exec('node ./models/seed/seedfile.js', function(err, stdout, stderr) {
     if (err) console.error(err);
     else console.log(stdout);
   });
-},
+}
 
 
 commands.create = commands.generate = commands.g = { model, migration };
@@ -61,24 +61,8 @@ function model() {
   if (!name) return console.bgRed('Must supply a name for the model.');
   name = name.pascal();
   var attrs = process.argv.slice(5);
-  attrs = attrs.reduce((obj, pair) => {
-    pair = pair.split(':');
-    obj[pair[0]] = pair[1].pascal();
-    return obj;
-  }, {});
 
-  for (var attr in attrs) {
-    var dataType = attrs[attr];
-    if (dataType.slice(0, 2) === 'Id') {
-      attrs[attr] = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
-    } 
-    else if (dataType === 'Mixed') {
-      attrs[attr] = `Schema.Types.Mixed`;
-    }
-    else if (!global[dataType]) {
-      return console.bgRed('Invalid data type ' + dataType);
-    }
-  }
+  attrs = parseAttrs(attrs);
 
   commands.init();
   console.cyan(`Creating new model: ${name}`);
@@ -89,7 +73,7 @@ function model() {
     if (err) console.red(err);
     else console.green(name + ' was successfully created!');
   });
-},
+}
 
 
 function migration() {
@@ -108,6 +92,28 @@ function migration() {
     if (err) console.red(err);
     else console.green(`Migration for ${name} was successfully created!`);
   });
+}
+
+function parseAttrs(attrs) {
+  attrs = attrs.reduce((obj, pair) => {
+    pair = pair.split(':');
+    obj[pair[0]] = pair[1].pascal();
+    return obj;
+  }, {});
+
+  for (var attr in attrs) {
+    var dataType = attrs[attr];
+    if (dataType.slice(0, 2) === 'Id') {
+      attrs[attr] = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
+    } 
+    else if (dataType === 'Mixed') {
+      attrs[attr] = `Schema.Types.Mixed`;
+    }
+    else if (!global[dataType]) {
+      return console.bgRed('Invalid data type ' + dataType);
+    }
+  }
+  return attrs;
 }
 
 

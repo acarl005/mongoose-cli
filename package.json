@@ -5,9 +5,7 @@
   "main": "server.js",
   "dependencies": {
     "colors": "^1.1.2",
-    "ejs": "^2.3.4",
-    "faker": "^3.0.1",
-    "mongoose": "^4.2.4"
+    "ejs": "^2.3.4"
   },
   "devDependencies": {},
   "engines": {
