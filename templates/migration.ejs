@@ -1,0 +1,10 @@
+var mongoose = require('mongoose');
+var <%- name %> = require('../<%- name %>.js');
+
+
+// manipulate your data here
+<%- name %>.find().exec()
+.then(results => {
+  console.log(results);
+  mongoose.connection.close();
+});

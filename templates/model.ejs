@@ -16,7 +16,6 @@ newSchema.pre('save', function(next){
   next();
 });
 
-
 newSchema.pre('update', function() {
   this.update({}, { $set: { updatedAt: new Date() } });
 });

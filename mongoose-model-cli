@@ -29,139 +29,85 @@ String.prototype.pascal = function() {
 }
 
 
-var commands = {
-  help: () => {
-    console.yellow('Welcome to mongoose-model-cli!');
-  },
+var commands = { help, init, seed };
 
-  init: () => {
-    var dir = fs.readdirSync('./');
-    var modelDir = dir.indexOf('models');
-    if (modelDir !== -1) return;
-    fs.mkdirSync('./models');
-    fs.mkdirSync('./models/seed');
-    fs.mkdirSync('./models/migrations');
-    fs.createReadStream('templates/.connection-string.js').pipe(fs.createWriteStream('models/.connection-string.js'));
-    fs.createReadStream('templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
-  },
+function help() {
+  console.yellow('Welcome to mongoose-model-cli!');
+},
 
-  seed: () => {
-    exec('node ./models/seed/seedfile.js', function(err, stdout, stderr) {
-      if (err) console.error(err);
-      else console.log(stdout);
-    });
-  },
+function init() {
+  var dir = fs.readdirSync('./');
+  var modelDir = dir.indexOf('models');
+  if (modelDir !== -1) return;
+  fs.mkdirSync('./models');
+  fs.mkdirSync('./models/seed');
+  fs.mkdirSync('./models/migrations');
+  fs.createReadStream('templates/.connection-string.js').pipe(fs.createWriteStream('models/.connection-string.js'));
+  fs.createReadStream('templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
+},
 
-};
+function seed() {
+  exec('node ./models/seed/seedfile.js', function(err, stdout, stderr) {
+    if (err) console.error(err);
+    else console.log(stdout);
+  });
+},
 
-commands.create = commands.generate = commands.g = {
 
-  model: () => {
-    var name = process.argv[4];
-    if (!name) return console.bgRed('Must supply a name for the model.');
-    name = name.pascal();
-    var attrs = process.argv.slice(5);
-    attrs = attrs.reduce((obj, pair) => {
-      pair = pair.split(':');
-      obj[pair[0]] = pair[1].pascal();
-      return obj;
-    }, {});
+commands.create = commands.generate = commands.g = { model, migration };
 
-    for (var attr in attrs) {
-      var dataType = attrs[attr];
-      if (dataType.slice(0, 2) === 'Id') {
-        attrs[attr] = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
-      } 
-      else if (dataType === 'Mixed') {
-        attrs[attr] = `Schema.Types.Mixed`;
-      }
-      else if (!global[dataType]) {
-        return console.bgRed('Invalid data type ' + dataType);
-      }
+function model() {
+  var name = process.argv[4];
+  if (!name) return console.bgRed('Must supply a name for the model.');
+  name = name.pascal();
+  var attrs = process.argv.slice(5);
+  attrs = attrs.reduce((obj, pair) => {
+    pair = pair.split(':');
+    obj[pair[0]] = pair[1].pascal();
+    return obj;
+  }, {});
+
+  for (var attr in attrs) {
+    var dataType = attrs[attr];
+    if (dataType.slice(0, 2) === 'Id') {
+      attrs[attr] = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
+    } 
+    else if (dataType === 'Mixed') {
+      attrs[attr] = `Schema.Types.Mixed`;
     }
-
-    commands.init();
-    console.cyan(`Creating new model: ${name}`);
-
-    var file = ejs.render(fs.readFileSync('./templates/model.ejs').toString(), { name, attrs });
-    console.log(file);
-//     var file = `\
-// var mongoose = require('mongoose');
-// var Schema = mongoose.Schema;
-// if (mongoose.connection.readyState === 0) {
-//   mongoose.connect(require('./.connection-string'));
-// }
-
-// var newSchema = new Schema({
-// `;
-
-//     for (var attr in attrs) {
-//       var dataType = attrs[attr];
-//       if (dataType.slice(0, 2) === 'Id') {
-//         dataType = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
-//       } 
-//       else if (dataType === 'Mixed') {
-//         dataType = `Schema.Types.Mixed`;
-//       }
-//       else if (!global[dataType]) {
-//         return console.bgRed('Invalid data type ' + dataType);
-//       }
-//       file += `  '${attr}': { type: ${dataType} },\n`;
-//     }
-
-//     file += `\
-//   'createdAt': { type: Date, default: Date.now },
-//   'updatedAt': { type: Date, default: Date.now }
-// });
-
-// newSchema.pre('save', function(next){
-//   this.updatedAt = Date.now();
-//   next();
-// });
-
-
-// newSchema.pre('update', function() {
-//   this.update({}, { $set: { updatedAt: new Date() } });
-// });
-
-// module.exports = mongoose.model('${name}', newSchema);
-// `;
-
-    fs.writeFile(`models/${name}.js`, file, err => {
-      if (err) console.red(err);
-      else console.green(name + ' was successfully created!');
-    });
-  },
-
-
-  migration: () => {
-    var name = process.argv[4];
-    if (!name) return console.red('You must specify the model for this migration');
-    name = name.pascal();
-    var models = fs.readdirSync('./models');
-    var modelInd = models.indexOf(name + '.js');
-    if (modelInd === -1) 
-      return console.red('You have yet to create a model: ' + name);
-    console.cyan('Creating a migration file for: ' + name);
-    var file = `\
-var mongoose = require('mongoose');
-var ${name} = require('../${name}.js');
-
-
-// manipulate your data here
-${name}.find().exec()
-.then(results => {
-  console.log(results);
-  mongoose.connection.close();
-});
-`;
-    fs.writeFile(`models/migrations/${name}-${Date.now()}.js`, file, err => {
-      if (err) console.red(err);
-      else console.green(`Migration for ${name} was successfully created!`);
-    });
+    else if (!global[dataType]) {
+      return console.bgRed('Invalid data type ' + dataType);
+    }
   }
 
+  commands.init();
+  console.cyan(`Creating new model: ${name}`);
 
+  var file = ejs.render(fs.readFileSync('./templates/model.ejs').toString(), { name, attrs });
+
+  fs.writeFile(`models/${name}.js`, file, err => {
+    if (err) console.red(err);
+    else console.green(name + ' was successfully created!');
+  });
+},
+
+
+function migration() {
+  var name = process.argv[4];
+  if (!name) return console.red('You must specify the model for this migration');
+  name = name.pascal();
+  var models = fs.readdirSync('./models');
+  var modelInd = models.indexOf(name + '.js');
+  if (modelInd === -1) 
+    return console.red('You have yet to create a model: ' + name);
+
+  console.cyan('Creating a migration file for: ' + name);
+  var file = ejs.render(fs.readFileSync('./templates/migration.ejs').toString(), { name });
+
+  fs.writeFile(`models/migrations/${name}-${Date.now()}.js`, file, err => {
+    if (err) console.red(err);
+    else console.green(`Migration for ${name} was successfully created!`);
+  });
 }
 
 
@@ -174,6 +120,6 @@ try {
   else
     commands[command]();
 } catch(err) {
-  console.bgRed(err);
+  if (Object.keys(err).length) console.bgRed(err);
   commands.help();
 }
