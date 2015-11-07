@@ -1,8 +1,7 @@
 #!/usr/local/bin/node
 
-var Promise = require('bluebird');
 var fs = require('fs');
-var exec = Promise.promisify(require('child_process').exec);
+var exec = require('child_process').exec;
 var colors = require('colors');
 
 // add methods to the console for each of the styles in the colors library
@@ -41,21 +40,15 @@ var commands = {
     fs.mkdirSync('./models');
     fs.mkdirSync('./models/seed');
     fs.mkdirSync('./models/migrations');
-    var file = `\
-// place connection string here
-// e.g. var uri = 'mongodb://andy:corn@ds051334.mongolab.com:51334/cli';
-// or   var uri = config.get('mongo');
-var uri = '';
-if (!uri) throw new Error('\\033[31mYou need to provide the connection string. Open "models/.connection-string.js" and export it.\\033[0m');
-module.exports = uri;
-`;
-    fs.writeFile('./models/.connection-string.js', file);
+    fs.createReadStream('templates/.connection-string.js').pipe(fs.createWriteStream('models/.connection-string.js'));
+    fs.createReadStream('templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
   },
 
   seed: () => {
-    exec('node ./seedfile.js')
-    .then(console.log)
-    .catch(console.error);
+    exec('node ./models/seed/seedfile.js', function(err, stdout, stderr) {
+      if (err) console.error(err);
+      else console.log(stdout);
+    });
   },
 
 };

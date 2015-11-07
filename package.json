@@ -4,12 +4,15 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
-    "bluebird": "^3.0.5",
     "colors": "^1.1.2",
+    "ejs": "^2.3.4",
     "faker": "^3.0.1",
     "mongoose": "^4.2.4"
   },
   "devDependencies": {},
+  "engines": {
+    "node": "^4.2"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
