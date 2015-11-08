@@ -44,7 +44,7 @@ function init() {
   fs.mkdirSync('./models');
   fs.mkdirSync('./models/seed');
   fs.mkdirSync('./models/migrations');
-  setUri();
+  setUri('');
   // fs.createReadStream(root + 'templates/connection-string.js').pipe(fs.createWriteStream('models/connection-string.js'));
   fs.createReadStream(root + 'templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
   fs.createReadStream(root + 'templates/dropfile.js').pipe(fs.createWriteStream('models/seed/dropfile.js'));
@@ -67,8 +67,7 @@ function drop() {
 }
 
 function setUri(uri) {
-  uri = uri || process.argv[3];
-  uri = uri || '';
+  uri = (uri === undefined ? process.argv[3] : uri);
   var file = ejs.render(fs.readFileSync(root + 'templates/connection-string.ejs', 'utf-8'), { uri });
   fs.writeFileSync('models/connection-string.js', file);
 }
