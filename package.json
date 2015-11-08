@@ -1,6 +1,6 @@
 {
   "name": "mongoose-model-cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Generator for creating models, seeds, and migrations using mongoose.",
   "bin": {
     "mongoose": "./bin/mongoose-model-cli"
@@ -9,12 +9,16 @@
     "colors": "^1.1.2",
     "ejs": "^2.3.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "chai": "^3.4.0",
+    "mocha": "^2.3.3",
+    "mongoose": "^4.2.4"
+  },
   "engines": {
     "node": "^4.2"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/.bin/mocha -t 15000"
   },
   "repository": {
     "type": "git",

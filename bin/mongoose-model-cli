@@ -31,7 +31,7 @@ String.prototype.pascal = function() {
 }
 
 
-var commands = { help, init, seed };
+var commands = { help, init, seed, drop, setUri };
 
 function help() {
   console.yellow('Welcome to mongoose-model-cli!');
@@ -44,8 +44,10 @@ function init() {
   fs.mkdirSync('./models');
   fs.mkdirSync('./models/seed');
   fs.mkdirSync('./models/migrations');
-  fs.createReadStream(root + 'templates/connection-string.js').pipe(fs.createWriteStream('models/connection-string.js'));
+  setUri();
+  // fs.createReadStream(root + 'templates/connection-string.js').pipe(fs.createWriteStream('models/connection-string.js'));
   fs.createReadStream(root + 'templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
+  fs.createReadStream(root + 'templates/dropfile.js').pipe(fs.createWriteStream('models/seed/dropfile.js'));
 }
 
 function seed() {
@@ -55,26 +57,38 @@ function seed() {
   });
 }
 
+function drop() {
+  var command = 'node ./models/seed/dropfile.js ';
+  var args = process.argv.slice(3).map(name => name.pascal()).join(' ');
+  exec(command + args, function(err, stdout, stderr) {
+    if (err) console.error(err);
+    else console.log(stdout);
+  });
+}
+
+function setUri(uri) {
+  uri = uri || process.argv[3];
+  uri = uri || '';
+  var file = ejs.render(fs.readFileSync(root + 'templates/connection-string.ejs', 'utf-8'), { uri });
+  fs.writeFileSync('models/connection-string.js', file);
+}
+
 
 commands.create = commands.generate = commands.g = { model, migration };
 
-function model() {
-  var name = process.argv[4];
+function model(name) {
   if (!name) return console.bgRed('Must supply a name for the model.');
   name = name.pascal();
-  var attrs = process.argv.slice(5);
-
+  var attrs = [].slice.call(arguments, 1);
   attrs = parseAttrs(attrs);
 
   commands.init();
   console.cyan(`Creating new model: ${name}`);
 
-  var file = ejs.render(fs.readFileSync(root + 'templates/model.ejs').toString(), { name, attrs });
+  var file = ejs.render(fs.readFileSync(root + 'templates/model.ejs', 'utf-8'), { name, attrs });
 
-  fs.writeFile(`models/${name}.js`, file, err => {
-    if (err) console.red(err);
-    else console.green(name + ' was successfully created!');
-  });
+  fs.writeFileSync(`models/${name}.js`, file);
+  console.green(name + ' was successfully created!');
 }
 
 
@@ -88,12 +102,10 @@ function migration() {
     return console.red('You have yet to create a model: ' + name);
 
   console.cyan('Creating a migration file for: ' + name);
-  var file = ejs.render(fs.readFileSync(root + 'templates/migration.ejs').toString(), { name });
+  var file = ejs.render(fs.readFileSync(root + 'templates/migration.ejs', 'utf-8'), { name });
 
-  fs.writeFile(`models/migrations/${name}-${Date.now()}.js`, file, err => {
-    if (err) console.red(err);
-    else console.green(`Migration for ${name} was successfully created!`);
-  });
+  fs.writeFileSync(`models/migrations/${name}-${Date.now()}.js`, file);
+  console.green(`Migration for ${name} was successfully created!`);
 }
 
 function parseAttrs(attrs) {
@@ -122,12 +134,16 @@ function parseAttrs(attrs) {
 var command = process.argv[2];
 var type = process.argv[3];
 
+
 try {
-  if (type)
-    commands[command][type]();
-  else
+  if (typeof commands[command] === 'object') {
+    var args = process.argv.slice(4);
+    commands[command][type].apply(this, args);
+  } else
     commands[command]();
 } catch(err) {
   if (Object.keys(err).length) console.bgRed(err);
   commands.help();
 }
+
+module.exports = commands

@@ -11,6 +11,11 @@ names.forEach(name => {
 });
 
 
+//------------------------
+// ADD SEED BELOW
+//------------------------
+
+
 
 // suggested module for generating fake contextual data
 // var Faker = require('faker');
@@ -25,6 +30,7 @@ names.forEach(name => {
 // ])
 
 // .then(() => {
+//   console.log("Seed complete!")  
 //   mongoose.connection.close();
 // });
 
