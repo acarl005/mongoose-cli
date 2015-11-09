@@ -3,8 +3,9 @@ var repl = require('repl');
 
 module.exports = function shell() {
   try {
-    var uri = require(__filename + '/../../models/connection-string');
+    var uri = require(process.cwd() + '/models/connection-string');
   } catch(err) {
+    console.red(err);
     return console.red("You need to provide the connection string. You can open 'models/connection-string.js' and export it or use the 'setUri' command.");
   }
   var cmd = uri.replace(/^mongodb:\/\/(\w+):(.*?)@(.*?):(\d+)\/(\w+)$/, "--host '$3'  --port '$4' -u '$1' -p '$2' $5");
