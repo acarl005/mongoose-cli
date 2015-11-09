@@ -4,6 +4,7 @@ var fs = require('fs');
 var exec = require('child_process').exec;
 var colors = require('colors');
 var ejs = require('ejs');
+var help = require('../help');
 
 var root = __dirname + '/../';
 
@@ -122,42 +123,23 @@ function parseAttrs(attrs) {
   return attrs;
 }
 
+if (!module.parent) {
 
-var command = process.argv[2];
-var type = process.argv[3];
+  var command = process.argv[2];
+  var type = process.argv[3];
 
-
-try {
-  var args = process.argv.slice(3);
-  if (typeof commands[command] === 'object') {
-    args = process.argv.slice(4);
-    commands[command][type].apply(this, args);
-  } else
-    commands[command].apply(this, args);
-} catch(err) {
-  if (Object.keys(err).length) console.bgRed(err);
-  commands.help.apply(this, args);
+  try {
+    var args = process.argv.slice(3);
+    if (typeof commands[command] === 'object') {
+      args = process.argv.slice(4);
+      commands[command][type].apply(this, args);
+    } else
+      commands[command].apply(this, args);
+  } catch(err) {
+    if (Object.keys(err).length) console.bgRed(err);
+    commands.help.apply(this, args);
+  }
 }
 
 module.exports = commands
 
-function help(command) {
-  switch(command) {
-    default: 
-      console.log(`\
-
-${'Welcome to mongoose-model-cli!'.yellow}
-
-${'Commands'.blue.underline}
-${'help:'.cyan}  Provides details for a command
-${'init:'.cyan}  Generates directory structure
-${'setUri:'.cyan}  Sets the connection string for connecting to MongoDB
-${'seed:'.cyan}  Runs the seed file in ./models/seed
-${'drop:'.cyan}  Drops some or all of the collections
-${'generate:'.cyan}  Creates a model or migration file
-
-For more info try ${'"mongoose help generate"'.green}
-\
-      `);
-  }
-}
