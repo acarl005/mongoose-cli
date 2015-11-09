@@ -27,15 +27,11 @@ for (var style in colors.styles) {
 // method to convert to pascal-case
 String.prototype.pascal = function() {
   return this.replace(/^([a-z])/, let => let.toUpperCase())
-             .replace(/[\-\_]([a-zA-Z])/,  let => let[1].toUpperCase());
+             .replace(/[\-\_][a-zA-Z]/,  let => let[1].toUpperCase());
 }
 
 
 var commands = { help, init, seed, drop, setUri };
-
-function help() {
-  console.yellow('Welcome to mongoose-model-cli!');
-}
 
 function init() {
   var dir = fs.readdirSync('./');
@@ -45,7 +41,6 @@ function init() {
   fs.mkdirSync('./models/seed');
   fs.mkdirSync('./models/migrations');
   setUri('');
-  // fs.createReadStream(root + 'templates/connection-string.js').pipe(fs.createWriteStream('models/connection-string.js'));
   fs.createReadStream(root + 'templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
   fs.createReadStream(root + 'templates/dropfile.js').pipe(fs.createWriteStream('models/seed/dropfile.js'));
 }
@@ -59,7 +54,7 @@ function seed() {
 
 function drop() {
   var command = 'node ./models/seed/dropfile.js ';
-  var args = process.argv.slice(3).map(name => name.pascal()).join(' ');
+  var args = [].map.call(arguments, name => name.pascal()).join(' ');
   exec(command + args, function(err, stdout, stderr) {
     if (err) console.error(err);
     else console.log(stdout);
@@ -67,7 +62,6 @@ function drop() {
 }
 
 function setUri(uri) {
-  uri = (uri === undefined ? process.argv[3] : uri);
   var file = ejs.render(fs.readFileSync(root + 'templates/connection-string.ejs', 'utf-8'), { uri });
   fs.writeFileSync('models/connection-string.js', file);
 }
@@ -91,8 +85,7 @@ function model(name) {
 }
 
 
-function migration() {
-  var name = process.argv[4];
+function migration(name) {
   if (!name) return console.red('You must specify the model for this migration');
   name = name.pascal();
   var models = fs.readdirSync('./models');
@@ -135,14 +128,36 @@ var type = process.argv[3];
 
 
 try {
+  var args = process.argv.slice(3);
   if (typeof commands[command] === 'object') {
-    var args = process.argv.slice(4);
+    args = process.argv.slice(4);
     commands[command][type].apply(this, args);
   } else
-    commands[command]();
+    commands[command].apply(this, args);
 } catch(err) {
   if (Object.keys(err).length) console.bgRed(err);
-  commands.help();
+  commands.help.apply(this, args);
 }
 
 module.exports = commands
+
+function help(command) {
+  switch(command) {
+    default: 
+      console.log(`\
+
+${'Welcome to mongoose-model-cli!'.yellow}
+
+${'Commands'.blue.underline}
+${'help:'.cyan}  Provides details for a command
+${'init:'.cyan}  Generates directory structure
+${'setUri:'.cyan}  Sets the connection string for connecting to MongoDB
+${'seed:'.cyan}  Runs the seed file in ./models/seed
+${'drop:'.cyan}  Drops some or all of the collections
+${'generate:'.cyan}  Creates a model or migration file
+
+For more info try ${'"mongoose help generate"'.green}
+\
+      `);
+  }
+}

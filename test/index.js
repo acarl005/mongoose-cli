@@ -14,6 +14,11 @@ describe('mongoose-model-cli', function() {
   describe('generate model', function() {
 
     it('generates the "models" directory', function() {
+      app.init();
+      expect(fs.readdirSync('./models')).to.have.length(3);
+    });
+
+    it('generates a model', function() {
       app.generate.model('user', 'name:string');
       expect(fs.readdirSync('./models')).to.have.length(4);
     });
