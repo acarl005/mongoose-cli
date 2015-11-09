@@ -4,7 +4,6 @@ var fs = require('fs');
 var exec = require('child_process').exec;
 var colors = require('colors');
 var ejs = require('ejs');
-var help = require('../help');
 
 var root = __dirname + '/../';
 
@@ -32,7 +31,10 @@ String.prototype.pascal = function() {
 }
 
 
-var commands = { help, init, seed, drop, setUri };
+var help = require('../commands/help');
+var shell = require('../commands/shell');
+
+var commands = { help, init, seed, drop, setUri, shell };
 
 function init() {
   var dir = fs.readdirSync('./');
@@ -66,6 +68,7 @@ function setUri(uri) {
   var file = ejs.render(fs.readFileSync(root + 'templates/connection-string.ejs', 'utf-8'), { uri });
   fs.writeFileSync('models/connection-string.js', file);
 }
+
 
 
 commands.create = commands.generate = commands.g = { model, migration };

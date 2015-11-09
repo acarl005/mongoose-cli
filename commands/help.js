@@ -60,6 +60,7 @@ ${'setUri:'.cyan}  Sets the connection string for connecting to MongoDB
 ${'seed:'.cyan}  Runs the seed file in ./models/seed
 ${'drop:'.cyan}  Drops some or all of the collections
 ${'generate:'.cyan}  Creates a model or migration file
+${'shell:'.cyan}  Opens a MongoDB shell
 
 For more info try ${'"mongoose help generate"'.green}
       `);

@@ -3,7 +3,7 @@ var expect = require('chai').expect;
 var fs = require('fs');
 var mongoose = require('mongoose');
 var exec = require('child_process').exec;
-var uri = 'mongodb://andy:corn@ds051334.mongolab.com:51334/cli';
+var uri = 'mongodb://andy:corn@localhost:27017/cli';
 
 describe('mongoose-model-cli', function() {
 
@@ -41,7 +41,7 @@ describe('mongoose-model-cli', function() {
   });
 
   describe('persisting the models', function() {
-
+    var User;
 
     function connectToMongo(done) {
       console.log("Connecting to MongoDB...");
@@ -54,13 +54,25 @@ describe('mongoose-model-cli', function() {
       }, 1000);
     }
 
-    before(connectToMongo);
+    function setup(next) {
+      app.setUri(uri);
+      User = require('../models/User.js');
+      next();
+    }
+
+    function dropUsers(done) {
+      User.remove({}, function(err) {
+        if (err) throw err;
+        done();
+      });
+    }
+
+    before(setup, connectToMongo, dropUsers);
 
     it('should save to mongo', function(done) {
-      var User = require('../models/User.js');
       User.create([
         { name: 'andy', age: 24 },
-        { name: 'alex', age: 23 },
+        { name: 'alex', age: 24 },
       ], function(err, res) {
         if (err) throw err;
         expect(res).to.have.length(2);
@@ -69,9 +81,18 @@ describe('mongoose-model-cli', function() {
       });
     });
 
+    it('should retrieve the data', function(done) {
+      User.find({}, function(err, data) {
+        if (err) throw err;
+        expect(data).to.have.length(2);
+        expect(data[0]).to.be.a('object');
+        expect(data[0]).to.have.property('name');
+        expect(data[0]).to.have.property('age').and.eql(24);
+        done();
+      });
+    });
+
     it('should drop the users', function(done) {
-      var User = require('../models/User.js');
-      app.setUri(uri);
       exec('node ./models/seed/dropfile.js User', function(err, stdout, stderr) {
         if (err) throw err;
         User.count(function(err, num) {
