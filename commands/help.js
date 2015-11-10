@@ -13,6 +13,13 @@ ${'"mongoose setUri \'mongodb://andy:corn@ds051334.mongolab.com:51334/cli\'"'.gr
 Sets the connection string to enable mongoose to connect to MongoDB.
       `); break;
 
+    case 'seed':
+      console.log(`
+${'seed command'.blue.underline}
+
+Edit the ${'models/seed/seedfile.js'.yellow}. All models are automatically required. Run the command to execute the seed file.
+      `); break;
+
     case 'drop':
       console.log(`
 ${'drop command'.blue.underline}
@@ -46,6 +53,14 @@ ${'"mongoose generate model user name:string houseId:id-house"'.green}
 
 Create new migration:
 ${'"mongoose generate migration user"'.green}
+      `); break;
+
+    case 'shell':
+      console.log(`
+${'shell command'.blue.underline}
+
+Native MongoDB shell. Use the native mongo query language.
+${'db.users.find({})'.green}
       `); break;
 
     case 'mshell':
