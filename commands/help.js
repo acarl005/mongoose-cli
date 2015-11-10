@@ -37,7 +37,7 @@ Empties some or all the collections in the database.
     case 'generate':
       console.log(`
 ${'generate command'.blue.underline}
-${'"mongoose generate model <modelName> [attr:type pairs]"'.green}
+${'"mongoose generate model <modelName> [attribute:dataType pairs]"'.green}
 ${'"mongoose generate migration <modelName>"'.green}
 
 Aliases:
@@ -47,7 +47,7 @@ Create new model:
 ${'built-in data types'.grey}
 ${'"mongoose generate model user name:string age:number likedFoods:array birth:date"'.green}
 ${'other mongoose types'.grey}
-${'"mongoose generate model user name:string notes:mixed house:id"'.green}
+${'"mongoose generate model user name:string notes:mixed houseId:id"'.green}
 ${'with a reference to another model'.grey}
 ${'"mongoose generate model user name:string houseId:id-house"'.green}
 
