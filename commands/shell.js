@@ -31,7 +31,8 @@ module.exports = {
       prompt: 'mongo> ',
       input: process.stdin,
       output: process.stdout,
-      eval: function(input, global, mode, finish) {
+      useColors: true,
+      eval: function(input, context, mode, finish) {
         finishFunc = finish;
         shell.stdin.write(input);
       }

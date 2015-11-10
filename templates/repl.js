@@ -11,8 +11,9 @@ names.forEach(name => {
   global[model.modelName] = model;
 });
 
-repl.start({
+var shell = repl.start({
   prompt: 'mongoose> ',
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
+  useColors: true,
 });
