@@ -2,6 +2,7 @@
 
 var fs = require('fs');
 var exec = require('child_process').exec;
+var execFileSync = require('child_process').execFileSync;
 var colors = require('colors');
 var ejs = require('ejs');
 
@@ -32,9 +33,11 @@ String.prototype.pascal = function() {
 
 
 var help = require('../commands/help');
-var shell = require('../commands/shell');
+var shell = require('../commands/shell').shell;
+var mshell = require('../commands/shell').mshell;
 
-var commands = { help, init, seed, drop, setUri, shell };
+var commands = { help, init, seed, drop, setUri, shell, mshell };
+
 
 function init() {
   var dir = fs.readdirSync('./');
@@ -46,6 +49,7 @@ function init() {
   setUri('');
   fs.createReadStream(root + 'templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
   fs.createReadStream(root + 'templates/dropfile.js').pipe(fs.createWriteStream('models/seed/dropfile.js'));
+  fs.createReadStream(root + 'templates/repl.js').pipe(fs.createWriteStream('models/seed/repl.js'));
 }
 
 function seed() {
