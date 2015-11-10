@@ -43,17 +43,6 @@ describe('mongoose-model-cli', function() {
   describe('persisting the models', function() {
     var User;
 
-    function connectToMongo(done) {
-      console.log("Connecting to MongoDB...");
-      if (!mongoose.connection.readyState) 
-        mongoose.connect(uri);
-      if (mongoose.connection.readyState === 1)
-        return done();
-      setTimeout(function() {
-        connectToMongo(done);
-      }, 1000);
-    }
-
     function setup(next) {
       app.setUri(uri);
       User = require('../models/User.js');
@@ -67,7 +56,7 @@ describe('mongoose-model-cli', function() {
       });
     }
 
-    before(setup, connectToMongo, dropUsers);
+    before(setup, dropUsers);
 
     it('should save to mongo', function(done) {
       User.create([

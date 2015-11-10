@@ -48,6 +48,14 @@ Create new migration:
 ${'"mongoose generate migration user"'.green}
       `); break;
 
+    case 'mshell':
+      console.log(`
+${'mshell command'.blue.underline}
+
+A JavaScript REPL with all the models required. Use the mongoose methods. Remember to handle asynchronicity.
+${'User.find({}, console.log)'.green} ${'// logs all the user objects'.grey}
+      `); break;
+
     default: 
       console.log(`\
 
@@ -60,7 +68,8 @@ ${'setUri:'.cyan}  Sets the connection string for connecting to MongoDB
 ${'seed:'.cyan}  Runs the seed file in ./models/seed
 ${'drop:'.cyan}  Drops some or all of the collections
 ${'generate:'.cyan}  Creates a model or migration file
-${'shell:'.cyan}  Opens a MongoDB shell
+${'shell:'.cyan}  Opens a native MongoDB shell
+${'mshell:'.cyan}  Opens a Node.js shell using mongoose methods
 
 For more info try ${'"mongoose help generate"'.green}
       `);
