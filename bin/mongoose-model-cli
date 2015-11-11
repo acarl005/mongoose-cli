@@ -69,6 +69,10 @@ function drop() {
 }
 
 function setUri(uri) {
+  if (uri) {
+    var cmd = uri.match(/^mongodb:\/\/(\w+):(.*?)@(.*?):(\d+)\/(\w+)$/);
+    if (!cmd) return console.red('Improperly formatted URI');
+  }
   var file = ejs.render(fs.readFileSync(root + 'templates/connection-string.ejs', 'utf-8'), { uri });
   fs.writeFileSync('models/connection-string.js', file);
 }
