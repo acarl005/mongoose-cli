@@ -2,7 +2,6 @@
 
 var fs = require('fs');
 var exec = require('child_process').exec;
-var execFileSync = require('child_process').execFileSync;
 var colors = require('colors');
 var ejs = require('ejs');
 
