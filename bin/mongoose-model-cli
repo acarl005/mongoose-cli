@@ -1,11 +1,7 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-var exec = require('child_process').exec;
 var colors = require('colors');
-var ejs = require('ejs');
 
-var root = __dirname + '/../';
 
 // add methods to the console for each of the styles in the colors library
 // e.g. console.green('hello', 'world')
@@ -34,104 +30,19 @@ String.prototype.pascal = function() {
 var help = require('../commands/help');
 var shell = require('../commands/shell').shell;
 var mshell = require('../commands/shell').mshell;
+var init = require('../commands/init');
+var seed = require('../commands/seed');
+var drop = require('../commands/drop');
+var setUri = require('../commands/setUri');
 
 var commands = { help, init, seed, drop, setUri, shell, mshell };
 
+var model = require('../commands/model');
+var migration = require('../commands/migration');
 
-function init() {
-  var dir = fs.readdirSync('./');
-  var modelDir = dir.indexOf('models');
-  if (modelDir !== -1) return;
-  fs.mkdirSync('./models');
-  fs.mkdirSync('./models/seed');
-  fs.mkdirSync('./models/migrations');
-  setUri('');
-  fs.createReadStream(root + 'templates/seedfile.js').pipe(fs.createWriteStream('models/seed/seedfile.js'));
-  fs.createReadStream(root + 'templates/dropfile.js').pipe(fs.createWriteStream('models/seed/dropfile.js'));
-  fs.createReadStream(root + 'templates/repl.js').pipe(fs.createWriteStream('models/seed/repl.js'));
-}
-
-function seed() {
-  exec('node ./models/seed/seedfile.js', function(err, stdout, stderr) {
-    if (err) console.error(err);
-    else console.log(stdout);
-  });
-}
-
-function drop() {
-  var command = 'node ./models/seed/dropfile.js ';
-  var args = [].map.call(arguments, name => name.pascal()).join(' ');
-  exec(command + args, function(err, stdout, stderr) {
-    if (err) console.error(err);
-    else console.log(stdout);
-  });
-}
-
-function setUri(uri) {
-  if (uri) {
-    var cmd = uri.match(/^mongodb:\/\/(\w+):(.*?)@(.*?):(\d+)\/(\w+)$/);
-    if (!cmd) return console.red('Improperly formatted URI');
-  }
-  var file = ejs.render(fs.readFileSync(root + 'templates/connection-string.ejs', 'utf-8'), { uri });
-  fs.writeFileSync('models/connection-string.js', file);
-}
+commands.create = commands.generate = commands.g = { model, migration, parent: commands };
 
 
-
-commands.create = commands.generate = commands.g = { model, migration };
-
-function model(name) {
-  if (!name) return console.bgRed('Must supply a name for the model.');
-  name = name.pascal();
-  var attrs = [].slice.call(arguments, 1);
-  attrs = parseAttrs(attrs);
-
-  commands.init();
-  console.cyan(`Creating new model: ${name}`);
-
-  var file = ejs.render(fs.readFileSync(root + 'templates/model.ejs', 'utf-8'), { name, attrs });
-
-  fs.writeFileSync(`models/${name}.js`, file);
-  console.green(name + ' was successfully created!');
-}
-
-
-function migration(name) {
-  if (!name) return console.red('You must specify the model for this migration');
-  name = name.pascal();
-  var models = fs.readdirSync('./models');
-  var modelInd = models.indexOf(name + '.js');
-  if (modelInd === -1) 
-    return console.red('You have yet to create a model: ' + name);
-
-  console.cyan('Creating a migration file for: ' + name);
-  var file = ejs.render(fs.readFileSync(root + 'templates/migration.ejs', 'utf-8'), { name });
-
-  fs.writeFileSync(`models/migrations/${name}-${Date.now()}.js`, file);
-  console.green(`Migration for ${name} was successfully created!`);
-}
-
-function parseAttrs(attrs) {
-  attrs = attrs.reduce((obj, pair) => {
-    pair = pair.split(':');
-    obj[pair[0]] = pair[1].pascal();
-    return obj;
-  }, {});
-
-  for (var attr in attrs) {
-    var dataType = attrs[attr];
-    if (dataType.slice(0, 2) === 'Id') {
-      attrs[attr] = `Schema.Types.ObjectId, ref: '${dataType.slice(2)}'`;
-    } 
-    else if (dataType === 'Mixed') {
-      attrs[attr] = `Schema.Types.Mixed`;
-    }
-    else if (!global[dataType]) {
-      return console.bgRed('Invalid data type ' + dataType);
-    }
-  }
-  return attrs;
-}
 
 if (!module.parent) {
 
@@ -142,12 +53,12 @@ if (!module.parent) {
     var args = process.argv.slice(3);
     if (typeof commands[command] === 'object') {
       args = process.argv.slice(4);
-      commands[command][type].apply(this, args);
+      commands[command][type].apply(commands[command], args);
     } else
-      commands[command].apply(this, args);
+      commands[command].apply(commands, args);
   } catch(err) {
     if (Object.keys(err).length) console.bgRed(err);
-    commands.help.apply(this, args);
+    commands.help.apply(commands, args);
   }
 }
 

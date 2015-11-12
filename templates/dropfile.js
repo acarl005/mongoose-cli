@@ -3,14 +3,8 @@ var mongoose = require('mongoose');
 
 
 // require all models in the 'models' directory
-var names = fs.readdirSync('./models');
-var models = {};
-names.forEach(name => {
-  if (!name.match(/\.js$/)) return;
-  if (name === 'connection-string.js') return;
-  var model = require('../' + name);
-  models[model.modelName] = model;
-});
+var models = require('../all-models');
+
 
 var args = process.argv.slice(2);
 var state = { count: 0 };

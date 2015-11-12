@@ -10,6 +10,7 @@
     "ejs": "^2.3.4"
   },
   "devDependencies": {
+    "bluebird": "^3.0.5",
     "chai": "^3.4.0",
     "mocha": "^2.3.3",
     "mongoose": "^4.2.4"
