@@ -11,6 +11,7 @@ names.forEach(name => {
   models[model.modelName] = model;
 });
 
+// define non-enumerable method to place each model onto an object. primarily for making them global
 Object.defineProperty(models.__proto__, 'toContext', {
   enumerable: false,
   value: function(context) {
