@@ -11,7 +11,7 @@ Example:
 ${'"mongoose setUri \'mongodb://andy:corn@ds051334.mongolab.com:51334/cli\'"'.green}
 
 Sets the connection string to enable mongoose to connect to MongoDB. If you need to dynamically determine \
-the URI, then you should directly edit the ${'models/connection-string.js'.yellow} file instead.
+the URI ${'(like depending on the ENV)'.gray}, then you should directly edit the ${'models/connection-string.js'.yellow} file instead.
       `); break;
 
     case 'seed':

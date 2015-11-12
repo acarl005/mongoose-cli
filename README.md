@@ -56,7 +56,7 @@ Generates files and directory structure (triggered automatically when a model is
 ```
 mongoose setUri <uri>
 ```
-Tells mongoose where the MongoDB is. Give it a mongo connection string, e.g. `mongodb://andy:corn@localhost:27017/cli`. If you need to dynamically determine the URI, then you should directly edit the `models/connection-string.js` file instead.
+Tells mongoose where the MongoDB is. Give it a mongo connection string, e.g. `mongodb://andy:corn@localhost:27017/cli`. If you need to dynamically determine the URI (e.g. have it depend on an enviroment variable), then you should directly edit the `models/connection-string.js` file instead.
 
 ####Creating models
 ```
