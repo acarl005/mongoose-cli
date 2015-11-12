@@ -1,13 +1,11 @@
-var fs = require('fs');
 var mongoose = require('mongoose');
-
 
 require('../all-models').toContext(global);
 
-//------------------------
-// ADD SEED BELOW
-//------------------------
 
+//------------------------
+// ADD SEEDS BELOW
+//------------------------
 
 
 // suggested module for generating fake contextual data

@@ -1,6 +1,4 @@
-var fs = require('fs');
 var mongoose = require('mongoose');
-
 
 // require all models in the 'models' directory
 var models = require('../all-models');

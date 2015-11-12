@@ -1,4 +1,3 @@
-var fs = require('fs');
 var repl = require('repl');
 var mongoose = require('mongoose');
 
