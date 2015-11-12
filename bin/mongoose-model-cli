@@ -43,26 +43,41 @@ var migration = require('../commands/migration');
 commands.create = commands.generate = commands.g = { model, migration, parent: commands };
 
 
-
+// only do this stuff (parsing argv) if its the parent script
 if (!module.parent) {
 
   var command = process.argv[2];
   var type = process.argv[3];
-
-  try {
-    var args = process.argv.slice(3);
-    if (typeof commands[command] === 'object') {
-      args = process.argv.slice(4);
-      var func = commands[command][type];
-      if (!func) return console.red(`Command ${type} doesn't exist.`);
-      commands[command][type].apply(commands[command], args);
-    } else
-      commands[command].apply(commands, args);
-  } catch(err) {
-    if (Object.keys(err).length) console.bgRed(err);
+  var args = process.argv.slice(3);
+  
+  if (!command || !commands[command])
     commands.help.apply(commands, args);
+  else if (typeof commands[command] === 'object') {
+    var args = process.argv.slice(4);
+    var func = commands[command][type];
+    if (!func) return console.red(`Command ${type} does not exist. Try model or migration`);
+    commands[command][type].apply(commands[command], args);
   }
+  else if (typeof commands[command] === 'function') {
+    commands[command].apply(commands, args);
+  }
+    
+
+  // try {
+  //   var args = process.argv.slice(3);
+  //   if (typeof commands[command] === 'object') {
+  //     args = process.argv.slice(4);
+  //     var func = commands[command][type];
+  //     if (!func) return console.red(`Command ${type} doesn't exist.`);
+  //     commands[command][type].apply(commands[command], args);
+  //   } else
+  //     commands[command].apply(commands, args);
+  // } catch(err) {
+  //   if (Object.keys(err).length) console.bgRed(err);
+  //   commands.help.apply(commands, args);
+  // }
 }
 
+// otherwise it is exported to make testing easier
 module.exports = commands
 

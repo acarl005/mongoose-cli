@@ -3,12 +3,8 @@ var repl = require('repl');
 
 module.exports = {
   shell: function () {
-    try {
-      var uri = require(process.cwd() + '/models/connection-string');
-    } catch(err) {
-      console.red(err);
-      return console.red("You need to provide the connection string. You can open 'models/connection-string.js' and export it or use the 'setUri' command.");
-    }
+
+    var uri = require(process.cwd() + '/models/connection-string');
     var cmd = uri.match(/^mongodb:\/\/(\w+):(.*?)@(.*?):(\d+)\/(\w+)$/);
     if (!cmd) return console.red('Improperly formatted URI');
 

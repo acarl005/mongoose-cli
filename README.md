@@ -37,6 +37,16 @@ This will give you the `mongoose` command. Type that to get the help page.
 
 **mshell:**  Opens a Node.js shell using mongoose methods
 
+###4. Easily connect to mongoose and require models!
+You can require the models individually, or just require them all like so:
+```javascript
+var models = require('./models/all-models');
+```
+This brings them in an an object. You can also place them all on the global scope like this:
+```javascript
+require('../all-models').toContext(global);
+```
+No need to use `mongoose.connect` anymore. That is done automatically when any of the models is required. Only one connection is made if multiple models are required.
 
 ##Docs
 

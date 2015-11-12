@@ -35,7 +35,8 @@ function parseAttrs(attrs) {
       attrs[attr] = `Schema.Types.Mixed`;
     }
     else if (!global[dataType]) {
-      return console.bgRed('Invalid data type ' + dataType);
+      throw new Error('\033[31m Invalid Data Type: \033[0m' + dataType);
+      // return console.bgRed('Invalid data type ' + dataType);
     }
   }
   return attrs;

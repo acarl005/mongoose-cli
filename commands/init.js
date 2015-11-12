@@ -1,7 +1,7 @@
 var fs = require('fs');
 var root = __dirname + '/../';
-// var setUri = require('./setUri');
 
+// build up the directory structure
 module.exports = function init() {
   var dir = fs.readdirSync('./');
   var modelDir = dir.indexOf('models');

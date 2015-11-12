@@ -7,6 +7,8 @@ module.exports = function migration(name) {
   if (!name) return console.red('You must specify the model for this migration');
   name = name.pascal();
   var models = fs.readdirSync('./models');
+
+  // make sure this model exists
   var modelInd = models.indexOf(name + '.js');
   if (modelInd === -1) 
     return console.red('You have yet to create a model: ' + name);
