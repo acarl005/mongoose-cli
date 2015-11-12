@@ -4,6 +4,6 @@ module.exports = function seed(cb) {
   exec('node ./models/seed/seedfile.js', function(err, stdout, stderr) {
     if (err) console.error(err);
     else console.log(stdout);
-    cb(err, stdout, stderr);
+    cb && cb(err, stdout, stderr);
   });
 }

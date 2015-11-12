@@ -4,6 +4,7 @@ var root = __dirname + '/../';
 
 
 module.exports = function model(name) {
+
   if (!name) return console.bgRed('Must supply a name for the model.');
   name = name.pascal();
   var attrs = [].slice.call(arguments, 1);

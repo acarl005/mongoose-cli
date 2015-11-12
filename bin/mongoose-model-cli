@@ -53,6 +53,8 @@ if (!module.parent) {
     var args = process.argv.slice(3);
     if (typeof commands[command] === 'object') {
       args = process.argv.slice(4);
+      var func = commands[command][type];
+      if (!func) return console.red(`Command ${type} doesn't exist.`);
       commands[command][type].apply(commands[command], args);
     } else
       commands[command].apply(commands, args);
