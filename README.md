@@ -37,7 +37,7 @@ This will give you the `mongoose` command. Type that to get the help page.
 
 **mshell:**  Opens a Node.js shell using mongoose methods
 
-###4. Easily connect to mongoose and require models!
+###4. Easily connect to MongoDB and require models!
 You can require the models individually, or just require them all like so:
 ```javascript
 var models = require('./models/all-models');
