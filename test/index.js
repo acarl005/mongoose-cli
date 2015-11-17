@@ -186,9 +186,11 @@ SickUser.create([
 
   describe('encrypted fields', function() {
 
+    var SecureUser;
+
     it('should encrypt and validate password', function(done) {
       app.generate.model('secure_user', 'name:string', 'password:encrypted');
-      var SecureUser = require('../models/SecureUser');
+      SecureUser = require('../models/SecureUser');
       var david = new SecureUser({
         name: 'david',
         password: 'corn'
@@ -204,6 +206,21 @@ SickUser.create([
       });
     });
 
+    it('should not try to encrypt the password again when changing other fields', function(done) {
+      SecureUser.findOne({ name: 'david' }, function(err, david) {
+        if (err) throw new Error(err);
+        david.name = 'dave';
+        david.save(function(err, dave) {
+          if (err) throw new Error(err);
+          expect(dave).to.have.property('name').and.eql('dave');
+          dave.passwordCompare('corn', function(err, isMatch) {
+            if (err) throw new Error(err);
+            expect(isMatch).to.eql(true);
+            done();
+          });
+        });
+      });
+    });
 
   });
 
