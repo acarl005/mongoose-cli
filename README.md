@@ -79,6 +79,8 @@ mongoose generate model user name:string age:number likedFoods:array birth:date
 mongoose generate model user name:string notes:mixed houseId:id
 # specify an ID that references another model
 mongoose generate model user name:string houseId:id-house
+# get an encrypted field
+mongoose generate model user name:string password:encrypted
 ```
 #####Example
 Running this command:

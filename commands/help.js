@@ -36,6 +36,8 @@ Empties some or all the collections in the database.
       `); break;
 
     case 'generate':
+    case 'g':
+    case 'create':
       console.log(`
 ${'generate command'.blue.underline}
 ${'"mongoose generate model <modelName> [attribute:dataType pairs]"'.green}
@@ -51,6 +53,8 @@ ${'other mongoose types'.grey}
 ${'"mongoose generate model user name:string notes:mixed houseId:id"'.green}
 ${'with a reference to another model'.grey}
 ${'"mongoose generate model user name:string houseId:id-house"'.green}
+${'with an encrypted field'.grey}
+${'"mongoose generate model user name:string password:encrypted"'.green}
 
 Create new migration:
 ${'"mongoose generate migration user"'.green}

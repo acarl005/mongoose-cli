@@ -38,7 +38,7 @@ newSchema.pre('save', function(next) {
   });
 });
 
-newSchema.methods['<%- name %>' + 'Compare'] = function(attempt, next) {
+newSchema.methods['<%- name + "Compare" %>'] = function(attempt, next) {
   bcrypt.compare(attempt, this['<%- name %>'], function(err, isMatch) {
     if (err) return next(err);
     next(null, isMatch);
