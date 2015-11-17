@@ -88,21 +88,40 @@ describe('mongoose-model-cli', function() {
         { name: 'andy', age: 24 },
         { name: 'alex', age: 24 },
       ], function(err, res) {
-        if (err) throw err;
+        if (err) throw new Error(err);
         expect(res).to.have.length(2);
         expect(res[0]).to.have.property('name');
-        done();
+        setTimeout(done, 1000);
       });
     });
 
-    it('should retrieve the data', function(done) {
+    it('should retrieve and update the data', function(done) {
       User.find({}, function(err, data) {
-        if (err) throw err;
+        if (err) throw new Error(err);
         expect(data).to.have.length(2);
-        expect(data[0]).to.be.a('object');
-        expect(data[0]).to.have.property('name');
-        expect(data[0]).to.have.property('age').and.eql(24);
-        done();
+        var user = data[0];
+        expect(user).to.be.a('object');
+        expect(user).to.have.property('name');
+        expect(user).to.have.property('age').and.eql(24);
+        expect(user).to.have.property('update');
+        var updatedAt = user.updatedAt;
+        user.age = 25;
+        user.save(function(err, updatedUser) {
+          expect(user).to.have.property('age').and.eql(25);
+          expect(user.updatedAt).to.be.above(updatedAt);
+          done();
+        });
+      });
+    });
+
+    it('should update the user', function(done) {
+      User.update({ name: 'alex' }, { $set: { age: 26 } }, function(err) {
+        if (err) throw new Error(err);
+        User.findOne({ name: 'alex' }, function(err, alex) {
+          expect(alex.updatedAt).to.above(alex.createdAt);
+          expect(alex).to.have.property('age').and.eql(26);
+          done();
+        });
       });
     });
 
@@ -140,7 +159,7 @@ SickUser.create([
 
     it('should drop the user model', function(done) {
       exec('node ./models/seed/dropfile.js User', function(err, stdout, stderr) {
-        if (err) throw err;
+        if (err) throw new Error(err);
         User.count(function(err, num) {
           expect(num).to.eql(0);
           done();
@@ -150,7 +169,7 @@ SickUser.create([
 
     it('should drop all models', function(done) {
       exec('node ./models/seed/dropfile.js', function(err, stdout, stderr) {
-        if (err) throw err;
+        if (err) throw new Error(err);
         Promise.all([
           CoolUser.count(),
           SickUser.count(),
@@ -162,6 +181,29 @@ SickUser.create([
         });
       });
     });
+
+  });
+
+  describe('encrypted fields', function() {
+
+    it('should encrypt and validate password', function(done) {
+      app.generate.model('secure_user', 'name:string', 'password:encrypted');
+      var SecureUser = require('../models/SecureUser');
+      var david = new SecureUser({
+        name: 'david',
+        password: 'corn'
+      });
+      david.save(function(err, saved) {
+        if (err) throw new Error(err);
+        expect(saved).to.have.property('password').and.not.eql('corn');
+        saved.passwordCompare('corn', function(err, isMatch) {
+          if (err) throw new Error(err);
+          expect(isMatch).to.eql(true);
+          done();
+        });
+      });
+    });
+
 
   });
 
