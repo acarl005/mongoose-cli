@@ -2,13 +2,13 @@
 
 A handy CLI for speeding up mongoose-related workflow. Generate model and migration files automatically, use either of two shells, and seed data.
 
-###Get started 
+### Get started 
 ```
 npm install -g mongoose-model-cli
 ```
 This will give you the `mongoose` command. Type that to get the help page. 
 
-###1. Make your first model with:
+### 1. Make your first model with:
   ```
   mongoose generate model user name:string age:number foods:array
   ```
@@ -18,13 +18,13 @@ This will give you the `mongoose` command. Type that to get the help page.
   ```
   Models will have createdAt and updatedAt fields already implemented.
 
-###2. Set the Mongo URI
+### 2. Set the Mongo URI
   ```
   mongoose setUri 'mongodb://andy:corn@localhost:27017/cli'
   ```
   Now you can save to your DB, seed it, drop it, and probe it with one of the shells.
 
-###3. Use these commands
+### 3. Use these commands
 **help:**  Provides details for a command
 
 **seed:**  Runs the seed file in ./models/seed
@@ -37,7 +37,7 @@ This will give you the `mongoose` command. Type that to get the help page.
 
 **mshell:**  Opens a Node.js shell using mongoose methods
 
-###4. Easily connect to MongoDB and require models!
+### 4. Easily connect to MongoDB and require models!
 You can require the models individually, or just require them all like so:
 ```javascript
 var models = require('./models/all-models');
@@ -48,27 +48,27 @@ require('../all-models').toContext(global);
 ```
 No need to use `mongoose.connect` anymore. That is done automatically when any of the models is required. Only one connection is made if multiple models are required.
 
-##Docs
+## Docs
 
-####Getting help
+#### Getting help
 ```
 mongoose help [command name]
 ```
 Get details for a command.
 
-####Initializing project
+#### Initializing project
 ```
 mongoose init
 ```
 Generates files and directory structure (triggered automatically when a model is generated).
 
-####Setting MongoDB URI
+#### Setting MongoDB URI
 ```
 mongoose setUri <uri>
 ```
 Tells mongoose where the MongoDB is. Give it a mongo connection string, e.g. `mongodb://andy:corn@localhost:27017/cli`. If you need to dynamically determine the URI (e.g. have it depend on an enviroment variable), then you should directly edit the `models/connection-string.js` file instead.
 
-####Creating models
+#### Creating models
 ```
 mongoose generate model <model name> [atribute:dataType pairs]
 ```
@@ -82,7 +82,7 @@ mongoose generate model user name:string houseId:id-house
 # get an encrypted field
 mongoose generate model user name:string password:encrypted
 ```
-#####Example
+##### Example
 Running this command:
 ```
 mongoose generate model user name:string age:number notes:mixed houseId:id-house
@@ -119,13 +119,13 @@ module.exports = mongoose.model('User', newSchema);
 ```
 The `createdAt` and `updatedAt` fields are generated automatically with the appropriate hooks.
 
-####Seeding data
+#### Seeding data
 ```
 mongoose seed
 ```
 After initializing the project, thee will be a `models/seed/seedfile.js` that has all the models required automatically. Place DB insertions there and run the command to seed the database.
 
-####Migrations
+#### Migrations
 ```
 mongoose generate migration <model name>
 ```
@@ -144,7 +144,7 @@ User.find().exec()
 ```
 Once generated and editted, they need to be run manually, e.g. `node models/migrations/User-1447177237834.js`.
 
-####Shells for interacting with the data
+#### Shells for interacting with the data
 You have two options:
 ```
 mongoose shell
@@ -170,7 +170,7 @@ null [ { createdAt: Tue Nov 10 2015 09:44:40 GMT-0800 (PST),
 */
 ```
 
-####Drop collections
+#### Drop collections
 ```
 mongoose drop [model names]
 ```
