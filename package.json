@@ -1,6 +1,6 @@
 {
   "name": "mongoose-model-cli",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Generator for creating models, seeds, and migrations using mongoose.",
   "main": "./bin/mongoose-model-cli",
   "bin": {
