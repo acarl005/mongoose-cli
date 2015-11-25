@@ -109,7 +109,7 @@ describe('mongoose-model-cli', function() {
         user.save(function(err, updatedUser) {
           expect(user).to.have.property('age').and.eql(25);
           expect(user.updatedAt).to.be.above(updatedAt);
-          done();
+          setTimeout(done, 1000);
         });
       });
     });
@@ -120,6 +120,18 @@ describe('mongoose-model-cli', function() {
         User.findOne({ name: 'alex' }, function(err, alex) {
           expect(alex.updatedAt).to.above(alex.createdAt);
           expect(alex).to.have.property('age').and.eql(26);
+          setTimeout(done, 1000);
+        });
+      });
+    });
+
+    it('should findOneAndUpdate the user', function(done) {
+      User.findOneAndUpdate({ name: 'alex' }, { $set: { age: 27 } }, function(err, user) {
+        if (err) throw new Error(err);
+        var updatedAt = user.updatedAt;
+        User.findOne({ name: 'alex' }, function(err, alex) {
+          expect(alex.updatedAt).to.above(updatedAt);
+          expect(alex).to.have.property('age').and.eql(27);
           done();
         });
       });

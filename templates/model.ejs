@@ -23,6 +23,10 @@ newSchema.pre('update', function() {
   this.update({}, { $set: { updatedAt: Date.now() } });
 });
 
+newSchema.pre('findOneAndUpdate', function() {
+  this.update({}, { $set: { updatedAt: Date.now() } });
+});
+
 <% secureAttrs.forEach(function(name) { %>
 newSchema.pre('save', function(next) {
   var record = this;
