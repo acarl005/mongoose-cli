@@ -5,7 +5,7 @@ var mongoose = require('mongoose');
 var Promise = require('bluebird');
 mongoose.Promise = Promise;
 var exec = require('child_process').exec;
-var uri = 'mongodb://andy:corn@localhost:27017/cli';
+var uri = 'mongodb://localhost:27017/cli';
 
 
 describe('mongoose-model-cli', function() {
