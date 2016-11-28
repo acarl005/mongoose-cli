@@ -211,25 +211,29 @@ SickUser.create([
         name: 'david',
         password: 'corn'
       });
-      david.save(function(err, saved) {
+      david.save(function(err) {
         if (err) throw new Error(err);
-        expect(saved).to.have.property('password').and.not.eql('corn');
-        saved.passwordCompare('corn', function(err, isMatch) {
+
+        SecureUser.findOne({ name: 'david' }, function(err, david) {
           if (err) throw new Error(err);
-          expect(isMatch).to.eql(true);
-          done();
-        });
-      }).then();
+          expect(david).to.have.property('password').and.not.eql('corn');
+          david.passwordCompare('corn', function(err, isMatch) {
+            if (err) throw new Error(err);
+            expect(isMatch).to.eql(true);
+            done();
+          });
+        })
+
+      });
     });
 
-    xit('should not try to encrypt the password again when changing other fields', function(done) {
+    it('should not try to encrypt the password again when changing other fields', function(done) {
       SecureUser.findOne({ name: 'david' }, function(err, david) {
         if (err) throw new Error(err);
         david.name = 'dave';
         david.save(function(err, dave) {
           if (err) throw new Error(err);
           expect(dave).to.have.property('name').and.eql('dave');
-          console.log('Daves password: ', dave.password );
           dave.passwordCompare('corn', function(err, isMatch) {
             if (err) throw new Error(err);
             expect(isMatch).to.eql(true);
