@@ -1,21 +1,6 @@
 var bcrypt = require('bcrypt-nodejs');
 
 var SchemaUtils = {
-  updateTimestamp: function() {
-    this.update({}, { $set: { updatedAt: Date.now() } });
-  },
-
-  setTimestamp: function(next){
-    this.updatedAt = Date.now();
-    next();
-  },
-
-  createTimeStampHooks: function(schema) {
-    schema.pre('save', SchemaUtils.setTimestamp);
-    schema.pre('update', SchemaUtils.updateTimestamp);
-    schema.pre('findOneAndUpdate', SchemaUtils.updateTimestamp);
-  },
-
   createEncryptedFieldsHooksAndMethods: function(fieldNames, schema) {
     fieldNames.forEach(function(fieldName) {
       schema.methods[fieldName + 'Compare'] = function compareEncryptedFields(attempt, next) {

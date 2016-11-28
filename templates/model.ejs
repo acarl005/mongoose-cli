@@ -5,14 +5,12 @@ if (mongoose.connection.readyState === 0) {
   mongoose.connect(require('./connection-string'));
 }
 
-var newSchema = new Schema({
-  <% for (var attr in attrs) { %>
+var newSchema = new Schema({ <% for (var attr in attrs) { %>
   <%- "'" + attr + "': { type: " + attrs[attr] + " }," %><% } %>
-  'createdAt': { type: Date, default: Date.now },
-  'updatedAt': { type: Date, default: Date.now }
+}, {
+  timestamps: true
 });
-
-SchemaUtils.createTimeStampHooks(newSchema);
-<% if (secureAttrs.length) { %>SchemaUtils.createEncryptedFieldsHooksAndMethods(<%- JSON.stringify(secureAttrs) %>, newSchema);<% } %>
-
+<% if (secureAttrs.length) { %>
+SchemaUtils.createEncryptedFieldsHooksAndMethods(<%- JSON.stringify(secureAttrs) %>, newSchema);
+<% } %>
 module.exports = mongoose.model(<%- "'"+name+"'" %>, newSchema);
