@@ -17,7 +17,6 @@ var SchemaUtils = {
   },
 
   createEncryptedFieldsHooksAndMethods: function(fieldNames, schema) {
-
     fieldNames.forEach(function(fieldName) {
       schema.methods[fieldName + 'Compare'] = function compareEncryptedFields(attempt, next) {
         var fieldValue = this[fieldName];
