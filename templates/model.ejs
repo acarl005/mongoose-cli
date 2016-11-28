@@ -13,7 +13,6 @@ var newSchema = new Schema({
 });
 
 SchemaUtils.createTimeStampHooks(newSchema);
-<% if (secureAttrs.length) { %>
-SchemaUtils.createEncryptedFieldsHooksAndMethods(<%- JSON.stringify(secureAttrs) %>, newSchema);
-<% } %>
+<% if (secureAttrs.length) { %>SchemaUtils.createEncryptedFieldsHooksAndMethods(<%- JSON.stringify(secureAttrs) %>, newSchema);<% } %>
+
 module.exports = mongoose.model(<%- "'"+name+"'" %>, newSchema);
