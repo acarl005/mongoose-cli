@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var SchemaUtils = require('./schema-utils');
 if (mongoose.connection.readyState === 0) {
   mongoose.connect(require('./connection-string'));
 }
@@ -14,40 +15,10 @@ var newSchema = new Schema({
   'updatedAt': { type: Date, default: Date.now }
 });
 
-newSchema.pre('save', function(next){
-  this.updatedAt = Date.now();
-  next();
-});
+SchemaUtils.createTimeStampHooks(newSchema);
 
-newSchema.pre('update', function() {
-  this.update({}, { $set: { updatedAt: Date.now() } });
-});
-
-newSchema.pre('findOneAndUpdate', function() {
-  this.update({}, { $set: { updatedAt: Date.now() } });
-});
-
-<% secureAttrs.forEach(function(name) { %>
-newSchema.pre('save', function(next) {
-  var record = this;
-
-  // only hash if it has been modified (or is new)
-  if (!record.isModified('<%- name %>')) return next();
-
-  // hash the password using our new salt
-  bcrypt.hash(record['<%- name %>'], null, null, function(err, hash) {
-    if (err) return next(err);
-    record['<%- name %>'] = hash;
-    next();
-  });
-});
-
-newSchema.methods['<%- name + "Compare" %>'] = function(attempt, next) {
-  bcrypt.compare(attempt, this['<%- name %>'], function(err, isMatch) {
-    if (err) return next(err);
-    next(null, isMatch);
-  });
-};
-<% }) %>
+<% if (secureAttrs.length) { %>
+SchemaUtils.createEncryptedFieldsHooksAndMethods(<%- JSON.stringify(secureAttrs) %>, newSchema);
+<% } %>
 
 module.exports = mongoose.model(<%- "'"+name+"'" %>, newSchema);

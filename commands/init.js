@@ -14,4 +14,5 @@ module.exports = function init() {
   fs.createReadStream(root + 'templates/dropfile.js').pipe(fs.createWriteStream('models/seed/dropfile.js'));
   fs.createReadStream(root + 'templates/repl.js').pipe(fs.createWriteStream('models/seed/repl.js'));
   fs.createReadStream(root + 'templates/all-models.js').pipe(fs.createWriteStream('models/all-models.js'));
+  fs.createReadStream(root + 'templates/schema-utils.js').pipe(fs.createWriteStream('models/schema-utils.js'));
 }

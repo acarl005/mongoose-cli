@@ -3,10 +3,11 @@ var fs = require('fs');
 //require all the models 
 var models = {};
 var names = fs.readdirSync('./models');
+var utilityFiles = ['connection-string.js', 'all-models.js', 'schema-utils.js'];
 
 names.forEach(name => {
   if (!name.match(/\.js$/)) return;
-  if (name === 'connection-string.js' || name === 'all-models.js') return;
+  if (utilityFiles.indexOf(name) >= 0) return;
   var model = require('./' + name);
   models[model.modelName] = model;
 });

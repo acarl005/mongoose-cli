@@ -5,25 +5,29 @@ var mongoose = require('mongoose');
 var Promise = require('bluebird');
 mongoose.Promise = Promise;
 var exec = require('child_process').exec;
-var uri = 'mongodb://localhost:27017/cli';
+
+// create a temporary database
+var uri = 'mongodb://localhost:27017/mongoose_cli_test_' + (new Date()).getTime();
 
 
 describe('mongoose-model-cli', function() {
 
   after(function() {
     deleteFolderRecursive('./models');
+    // delete db after all
+    mongoose.connection.db.dropDatabase();
   });
 
   describe('generate model', function() {
 
     it('"init" generates the "models" directory', function() {
       app.init();
-      expect(fs.readdirSync('./models')).to.have.length(4);
+      expect(fs.readdirSync('./models')).to.have.length(5);
     });
 
     it('generates a model', function() {
       app.generate.model('user', 'name:string', 'age:number');
-      expect(fs.readdirSync('./models')).to.have.length(5);
+      expect(fs.readdirSync('./models')).to.have.length(6);
     });
 
     it('makes a model file with a string attribute', function() {
@@ -32,14 +36,14 @@ describe('mongoose-model-cli', function() {
 
     it('makes a model file with several attributes', function() {
       app.generate.model('cool_user', 'name:string', 'age:number', 'notes:mixed');
-      expect(fs.readdirSync('./models')).to.have.length(6);
+      expect(fs.readdirSync('./models')).to.have.length(7);
       expect(fs.readFileSync('./models/CoolUser.js', 'utf-8')).to.match(/'age': { type: Number },/);
       expect(fs.readFileSync('./models/CoolUser.js', 'utf-8')).to.match(/'notes': { type: Schema\.Types\.Mixed },/);
     });
 
     it('makes a model file with an association', function() {
       app.generate.model('sick-user', 'name:string', 'age:number', 'houseId:id-house');
-      expect(fs.readdirSync('./models')).to.have.length(7);
+      expect(fs.readdirSync('./models')).to.have.length(8);
       expect(fs.readFileSync('./models/SickUser.js', 'utf-8')).to.match(/'houseId': { type: Schema\.Types\.ObjectId, ref: 'House' },/);
     });
 
@@ -215,16 +219,17 @@ SickUser.create([
           expect(isMatch).to.eql(true);
           done();
         });
-      });
+      }).then();
     });
 
-    it('should not try to encrypt the password again when changing other fields', function(done) {
+    xit('should not try to encrypt the password again when changing other fields', function(done) {
       SecureUser.findOne({ name: 'david' }, function(err, david) {
         if (err) throw new Error(err);
         david.name = 'dave';
         david.save(function(err, dave) {
           if (err) throw new Error(err);
           expect(dave).to.have.property('name').and.eql('dave');
+          console.log('Daves password: ', dave.password );
           dave.passwordCompare('corn', function(err, isMatch) {
             if (err) throw new Error(err);
             expect(isMatch).to.eql(true);
