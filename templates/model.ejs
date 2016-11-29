@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var SchemaUtils = require('./schema-utils');
+<% if (secureAttrs.length) { %>var SchemaUtils = require('./schema-utils');<% } %>
 if (mongoose.connection.readyState === 0) {
   mongoose.connect(require('./connection-string'));
 }

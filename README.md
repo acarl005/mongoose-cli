@@ -85,12 +85,13 @@ mongoose generate model user name:string password:encrypted
 ##### Example
 Running this command:
 ```
-mongoose generate model user name:string age:number notes:mixed houseId:id-house
+mongoose generate model user name:string password:encrypted age:number notes:mixed houseId:id-house
 ```
 generates this model file called `User.js`:
 ```javascript
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var SchemaUtils = require('./schema-utils');
 if (mongoose.connection.readyState === 0) {
   mongoose.connect(require('./connection-string'));
 }
@@ -98,26 +99,20 @@ if (mongoose.connection.readyState === 0) {
 var newSchema = new Schema({
   
   'name': { type: String },
+  'password': { type: String },
   'age': { type: Number },
   'notes': { type: Schema.Types.Mixed },
-  'houseId': { type: Schema.Types.ObjectId, ref: 'House' },
-  'createdAt': { type: Date, default: Date.now },
-  'updatedAt': { type: Date, default: Date.now }
+  'houseId': { type: Schema.Types.ObjectId, ref: 'House' }
+}, {
+  timestamps: true
 });
 
-newSchema.pre('save', function(next){
-  this.updatedAt = Date.now();
-  next();
-});
-
-newSchema.pre('update', function() {
-  this.update({}, { $set: { updatedAt: new Date() } });
-});
+SchemaUtils.createEncryptedFieldsHooksAndMethods(["password"], newSchema);
 
 module.exports = mongoose.model('User', newSchema);
 
 ```
-The `createdAt` and `updatedAt` fields are generated automatically with the appropriate hooks.
+The `createdAt` and `updatedAt` fields are created and updated by Mongoose when `timestamps: true` option is set.
 
 #### Seeding data
 ```
